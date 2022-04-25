@@ -4,7 +4,7 @@
     margin-top: 20px;
     margin-left: 50%;
     transform: translateX(-50%);
-        
+    background-color: #180f44;
     image-rendering: -moz-crisp-edges;
     image-rendering: -webkit-crisp-edges;
     image-rendering: pixelated;

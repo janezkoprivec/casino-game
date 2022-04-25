@@ -1,4 +1,13 @@
-function StartGame(){    
+var speeds = [
+    [0.002, 0.003, 0.002, 0.004, 0.005],
+    [0.001, 0.006, 0.005, 0.004, 0.003],
+    [0.002, 0.006, 0.001, 0.002, 0.002],
+    [0.003, 0.003, 0.002, 0.003, 0.005],
+    [0.0005, 0.004, 0.002, 0.006, 0.001],
+]
+
+
+function StartGame(speeds){    
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
 
@@ -6,9 +15,11 @@ function StartGame(){
     const CANVAS_HEIGHT = canvas.height; 
 
     var positions; 
+    var balls = [];
 
     function drawTrack(r){
         ctx.beginPath();
+        ctx.strokeStyle = '#BDDF27'; 
         ctx.arc(CANVAS_WIDTH/2, CANVAS_HEIGHT/2, r, 0, 2 * Math.PI);
         ctx.stroke();
         
@@ -53,7 +64,19 @@ function StartGame(){
                 this.speed = this.speeds[this.frame/500];   
             }
 
-            this.distance += this.speed; 
+            this.distance += this.speed;
+            
+            if (this.distance >= 2){        
+                console.log('end'); 
+                // for( var i = 0; i < balls.length; i++){ 
+    
+                //     if ( balls[i].c === this.c) { 
+                
+                //         balls.splice(i, 1); 
+                //     }
+                
+                // }
+            }
 
             this.fi += Math.PI*this.speed; 
 
@@ -75,26 +98,20 @@ function StartGame(){
         }
     }
 
-    var balls = []; 
+   
 
-    var speeds = [
-        [0.002, 0.003, 0.002, 0.004, 0.005],
-        [0.001, 0.006, 0.005, 0.004, 0.003],
-        [0.002, 0.006, 0.001, 0.002, 0.002],
-        [0.003, 0.003, 0.002, 0.003, 0.005],
-        [0.0005, 0.004, 0.002, 0.006, 0.001],
-    ]
+    
     var colors = ['blue', 'black', 'red', 'yellow', 'green']; 
     for (var i = 0; i < 5; i++){
         var ball = new Ball(Math.PI, 10, colors[i], speeds[i], 300-(i*22)); 
         balls.push(ball); 
     }
 
+    // var ball = new Ball(Math.PI, 10, 'blue',  [0.002, 0.003, 0.002, 0.004, 0.005], 300); 
+    // balls.push(ball); 
+
     function newPositions(){
-        var positionsSave = positions;
-        // for (var i = 0; i < positions.length; i++){
-        //     positionsSave.push(positions[i]); 
-        // }
+
         var newPositions = positions.sort((a, b) => (a.distance >= b.distance) ? 1 : -1);
         var first = document.getElementById('1'); 
         first.textContent = '1. ' + newPositions[4].c; 
@@ -106,7 +123,7 @@ function StartGame(){
         fourth.textContent = '4. ' + newPositions[1].c;
         var fifth = document.getElementById('5'); 
         fifth.textContent = '5. ' + newPositions[0].c;
-        for (var i = 0; i < newPositions.length; i++){
+        // for (var i = 0; i < newPositions.length; i++){
             
         
             // console.log(positionsSave[i].c);
@@ -120,7 +137,7 @@ function StartGame(){
             //     // console.log(positions); 
             // }
 
-        }
+        // }
 
         // if (!newPositions.every(function(value, index) { return value === positionsSave[index]})){
         //     console.log(newPositions);
@@ -134,9 +151,11 @@ function StartGame(){
         for (var i = 0; i < 5; i++){
         balls[i].animate();  
         }
+        // balls[0].animate(); 
         requestAnimationFrame(Update); 
     }
     positions = balls; 
     Update(); 
 }
 
+StartGame(speeds); 
