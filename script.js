@@ -24,6 +24,7 @@ function StartGame(speeds){
     var positions; 
     var balls = [];
     var stardust = [];
+    var stardustCount = 0; 
 
     function drawTrack(r){
         ctx.beginPath();
@@ -41,10 +42,11 @@ function StartGame(speeds){
         ctx.fill();
     }
 
-    function Stardust(startx, starty, endx, endy, r, c, time){
+    function Stardust(id, startx, starty, endx, endy, r, c, time, alpha = 1){
+        this.id = id; 
         this.startx = startx; 
         this.starty = starty;
-        this.endx = endx; 
+        this.endx = endx;   
         this.endy = endy;  
         this.x = startx; 
         this.y = starty; 
@@ -52,10 +54,13 @@ function StartGame(speeds){
         this.c = c; 
         this.time = time; 
         this.animation = true; 
-        this.alpha = (Math.random() * (1 - 0.8) + 0.8).toFixed(4)
+        // this.alpha = (Math.random() * (1 - 0.4) + 0.4).toFixed(4);
+        this.alpha = alpha; 
+        
 
         this.draw = function () {
-            this.alpha -= 5*1/this.speed; 
+            // this.alpha = (this.alpha - 0.5/this.time).toFixed(4); 
+            // console.log(this.alpha); 
             ctx.globalAlpha = this.alpha; 
             ctx.beginPath();
             ctx.fillStyle = this.c;
@@ -74,7 +79,12 @@ function StartGame(speeds){
                 this.y -= (this.starty-this.endy)/this.time; 
                 this.draw();
             }
-            
+            else{
+
+                // stardust = stardust.filter(function( obj ) {
+                //     return obj.id !== this.id;
+                // });
+            }
         }
     }
 
@@ -145,10 +155,18 @@ function StartGame(speeds){
                     var endx = CANVAS_WIDTH/2 + this.pathR * rand * Math.cos(this.fi - i*3*Math.PI*this.speed);
                     var endy = CANVAS_HEIGHT/2 + this.pathR * rand * Math.sin(this.fi - i*3*Math.PI*this.speed);
 
-
-                    var sd = new Stardust(this.x, this.y, endx, endy, sdR, this.c, (Math.random() * (30 - 20) + 20).toFixed(4));
-                    stardust.push(sd); 
-                    this.nextStartdust = Math.round(Math.random()*3); 
+                    if (stardustCount%20 != 0){
+                        var sd = new Stardust(stardustCount, this.x, this.y, endx, endy, sdR, this.c, (Math.random() * (30 - 20) + 20).toFixed(4));
+                        stardustCount++; 
+                        stardust.push(sd); 
+                        this.nextStartdust = Math.round(Math.random()*3); 
+                    }else{
+                        var sd = new Stardust(stardustCount, this.x, this.y, Math.random()*CANVAS_WIDTH, Math.random()*CANVAS_HEIGHT, sdR, this.c, (Math.random() * (1000 - 800) + 800).toFixed(4), (Math.random() * (0.6 - 0.4) + 0.4).toFixed(4));
+                        stardustCount++; 
+                        stardust.push(sd); 
+                        this.nextStartdust = Math.round(Math.random()*3); 
+                    }
+                    
                     
                 }
                 
