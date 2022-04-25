@@ -9,6 +9,7 @@ var speeds = [
     [0.0005, 0.004, 0.002, 0.006, 0.001],
 ]
 
+var startAnimation = false; 
 
 function StartGame(speeds){    
     var canvas = document.getElementById('canvas');
@@ -16,6 +17,10 @@ function StartGame(speeds){
 
     starknet = new Image();
     starknet.src = 'img/StarkNet-Icon.png';
+    starknet.onload = function() {
+        ctx.drawImage(starknet, CANVAS_WIDTH/2-75, CANVAS_HEIGHT/2-75, 150, 150);
+
+      };
 
     const CANVAS_WIDTH = canvas.width; 
     const CANVAS_HEIGHT = canvas.height; 
@@ -259,10 +264,16 @@ function StartGame(speeds){
         }
         
         // balls[0].animate(); 
-        requestAnimationFrame(Update); 
+        if (startAnimation){
+            requestAnimationFrame(Update); 
+        }
+        
     }
     positions = balls; 
     Update(); 
 }
+
+var button = document.getElementById('start'); 
+button.onclick = function(){startAnimation = true; StartGame(speeds); };
 
 StartGame(speeds); 
