@@ -14,8 +14,10 @@ function StartGame(speeds){
     const CANVAS_WIDTH = canvas.width; 
     const CANVAS_HEIGHT = canvas.height; 
 
+ 
     var positions; 
     var balls = [];
+    var stardust = [];
 
     function drawTrack(r){
         ctx.beginPath();
@@ -33,12 +35,39 @@ function StartGame(speeds){
         ctx.fill();
     }
 
+    function Stardust(startx, starty, endx, endy, r, c, time){
+        this.startx = startx; 
+        this.starty = starty; 
+        this.x = startx; 
+        this.y = starty; 
+        this.r = r; 
+        this.c = c; 
+        this.time = time; 
+
+        this.draw = function () {
+            ctx.globalAlpha = 1; 
+            ctx.beginPath();
+            ctx.fillStyle = this.c;
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+            ctx.fill();
+            
+        }
+
+        this.animate = function() {
+            
+            this.draw();
+        }
+    }
+
+
     function Ball( fi, r, c, speeds, pathR) {
         this.fi = fi; 
         this.r = r;
         this.c = c;
         this.speeds = speeds;
         this.pathR = pathR;  
+        this.animation = true;
+        this.nextStartdust = 10;  
 
         this.distance=0; 
 
@@ -57,51 +86,77 @@ function StartGame(speeds){
         this.frame = 0;
         this.speed = 0;  
         
-
+        
         this.animate = function() {
             drawTrack(this.pathR);
-            if (this.frame % 500 == 0){
-                this.speed = this.speeds[this.frame/500];   
-            }
+            if (this.animation){
 
-            this.distance += this.speed;
-            
-            if (this.distance >= 2){        
-                console.log('end'); 
-                // for( var i = 0; i < balls.length; i++){ 
+                //change speeds
+                if (this.frame % 500 == 0){
+                    this.speed = this.speeds[this.frame/500];   
+                }
     
-                //     if ( balls[i].c === this.c) { 
+                this.distance += this.speed;
                 
-                //         balls.splice(i, 1); 
-                //     }
+                //stop animation at finish, number is 2 * laps
+                if (this.distance >= 6){        
+                    console.log('end'); 
+    
+                    this.animation = false; 
+                }
+    
+                this.fi += Math.PI*this.speed; 
                 
+                //draw tails
+                for (var i = 0; i < 10; i++){
+                    var tailX = CANVAS_WIDTH/2 + this.pathR * (1+(i*this.speed)) * Math.cos(this.fi - i*3*Math.PI*this.speed); 
+                    var tailY = CANVAS_HEIGHT/2 + this.pathR * (1+(i*this.speed)) * Math.sin(this.fi - i*3*Math.PI*this.speed); 
+    
+                    var tailR = (1 - (i/10)) * this.r;
+                    var tailA = 1 - (i/10); 
+                    
+                    drawTail(tailX, tailY, tailR, this.c, tailA); 
+                }
+
+                //draw stardust 
+                
+                // if (this.nextStartdust == 0){
+                //     var sdR = Math.round(Math.random() * 5); 
+                //     var endx = 0; 
+                //     var endy = 0; 
+
+
+                //     var sd = new Stardust(this.x, this.y, endx, endy, sdR, this.c, 100*Math.random())
+                //     stardust.push(sd); 
+                //     console.log("stardust added");
+                //     this.nextStartdust = Math.round(Math.random()*20); 
+                    
                 // }
-            }
-
-            this.fi += Math.PI*this.speed; 
-
-            for (var i = 0; i < 10; i++){
-                var tailX = CANVAS_WIDTH/2 + this.pathR * (1+(i*this.speed)) * Math.cos(this.fi - i*3*Math.PI*this.speed); 
-                var tailY = CANVAS_HEIGHT/2 + this.pathR * (1+(i*this.speed)) * Math.sin(this.fi - i*3*Math.PI*this.speed); 
-
-                var tailR = (1 - (i/10)) * this.r;
-                var tailA = 1 - (i/10); 
                 
-                drawTail(tailX, tailY, tailR, this.c, tailA); 
+                // if(this.nextStartdust < 0 ){
+                //     this.nextStartdust = - this.nextStartdust; 
+                // }
+
+                //draw dot 
+                this.x = CANVAS_WIDTH/2 + pathR * Math.cos(this.fi); 
+                this.y = CANVAS_HEIGHT/2 + (pathR * Math.sin(this.fi)); 
+    
+                this.draw(); 
+                this.frame++; 
+                this.nextStartdust--; 
+                console.log(this.nextStartdust);
             }
 
-            this.x = CANVAS_WIDTH/2 + pathR * Math.cos(this.fi); 
-            this.y = CANVAS_HEIGHT/2 + (pathR * Math.sin(this.fi)); 
-
-            this.draw(); 
-            this.frame++; 
+            else{
+                this.draw(); 
+            }
         }
     }
 
    
 
     
-    var colors = ['blue', 'black', 'red', 'yellow', 'green']; 
+    var colors = ['blue', 'white', 'red', 'yellow', 'green']; 
     for (var i = 0; i < 5; i++){
         var ball = new Ball(Math.PI, 10, colors[i], speeds[i], 300-(i*22)); 
         balls.push(ball); 
@@ -147,10 +202,24 @@ function StartGame(speeds){
 
     function Update() {
         ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); 
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "red";
+        ctx.fillText("START/FINISH", 70, 360);  
+        ctx.beginPath();
+        ctx.strokeStyle = "red";
+        ctx.moveTo(290, 350);
+        ctx.lineTo(400, 350);
+        ctx.stroke();
         newPositions(); 
-        for (var i = 0; i < 5; i++){
-        balls[i].animate();  
+
+        for (var i = 0; i < stardust.length; i++){
+            stardust[i].animate(); 
         }
+
+        for (var i = 0; i < 5; i++){
+            balls[i].animate();  
+        }
+        
         // balls[0].animate(); 
         requestAnimationFrame(Update); 
     }
