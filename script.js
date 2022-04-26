@@ -1,20 +1,37 @@
-var speeds = [
+var speedsBase = [
     [0.002, 0.003, 0.002, 0.004, 0.005],
-    [0.001, 0.006, 0.005, 0.004, 0.003],
-    [0.002, 0.006, 0.001, 0.002, 0.002],
+    [0.0015, 0.006, 0.001, 0.002, 0.002],
     [0.003, 0.003, 0.002, 0.003, 0.005],
     [0.0005, 0.004, 0.002, 0.006, 0.001],
-    [0.002, 0.006, 0.001, 0.002, 0.002],
-    [0.003, 0.003, 0.002, 0.003, 0.005],
-    [0.0005, 0.004, 0.002, 0.006, 0.001],
+    [0.001, 0.006, 0.005, 0.004, 0.003]
 ]
+
+var winningSpeed = [0.001, 0.006, 0.005, 0.004, 0.003];
+
 
 var startAnimation = false; 
 
-function StartGame(speeds){    
+function getShiftedSpeeds(winner){
+    var finalSpeeds = [];
+    var pushed = 0; 
+    for (var i = 0; i < 5; i++){
+        if (i != winner){
+            finalSpeeds.push(speedsBase[i-pushed]);
+        }else{
+            finalSpeeds.push(winningSpeed); 
+            pushed = 1; 
+        }
+    }
+
+    return finalSpeeds; 
+}
+
+function StartGame(speedsAll){    
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
+    this.speedsAll = speedsAll; 
 
+    console.log(speedsAll);
     starknet = new Image();
     starknet.src = 'img/StarkNet-Icon.png';
     starknet.onload = function() {
@@ -25,7 +42,7 @@ function StartGame(speeds){
     const CANVAS_WIDTH = canvas.width; 
     const CANVAS_HEIGHT = canvas.height; 
 
- 
+      
     var positions; 
     var balls = [];
     var stardust = [];
@@ -199,7 +216,7 @@ function StartGame(speeds){
     
     var colors = ['blue', 'white', 'red', 'yellow', 'green']; 
     for (var i = 0; i < colors.length; i++){
-        var ball = new Ball(Math.PI, 10, colors[i], speeds[i], 300-(i*22)); 
+        var ball = new Ball(Math.PI, 10, colors[i], this.speedsAll[i], 300-(i*22)); 
         balls.push(ball); 
     }
 
@@ -274,6 +291,6 @@ function StartGame(speeds){
 }
 
 var button = document.getElementById('start'); 
-button.onclick = function(){startAnimation = true; StartGame(speeds); };
+button.onclick = function(){startAnimation = true; StartGame(getShiftedSpeeds(4)); };
 
-StartGame(speeds); 
+StartGame(speedsBase); 
